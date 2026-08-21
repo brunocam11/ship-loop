@@ -19,6 +19,8 @@ In the order they run:
 5. `/submit` — I read the diff, then this commits the slice (one-line conventional commit, no attribution) and opens a tight PR.
 6. `/greploop` — run Greptile on the PR and fix its comments in a loop until it scores 5/5 with nothing unresolved. Then merge, and on to the next slice.
 
+For longer work, `/handoff` saves the current state before a context reset and `/continue` picks it up in a fresh conversation. They store one pending handoff per repository under `~/.ship-loop/handoffs/` and do not change the shipping sequence.
+
 Independent slices I run at the same time, each in its own git worktree and terminal. Dependent ones stack on each other's branches so I'm not waiting on a merge to start the next. I use Warp for the panes and treehouse for the worktrees.
 
 ## Principles and playbook
@@ -46,7 +48,7 @@ Load the principles globally by importing `principles.md` from your `~/.claude/C
 @/absolute/path/to/ship-loop/principles.md
 ```
 
-Then invoke a skill with `/scope`, `/grill-me`, `/slice`, `/next-task`, `/submit`, `/greploop`.
+Then invoke a skill with `/scope`, `/grill-me`, `/slice`, `/next-task`, `/submit`, `/greploop`, `/handoff`, or `/continue`.
 
 ## Tools I lean on
 
