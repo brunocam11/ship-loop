@@ -3,7 +3,7 @@ A small set of Claude Code skills that turn a feature into a stack of small, rev
 ## The loop
 
 ```
-scope ─▶ grill-me ─▶ slice ─▶ next-task ─▶ submit ─▶ greploop ─▶ merge PR
+scope ─▶ grill-me ─▶ slice ─▶ next-task ─▶ review ─▶ submit ─▶ merge PR
 ```
 
 `scope` and `grill-me` run once per feature; `slice` onward repeats for each PR until the stack is merged.
@@ -16,8 +16,8 @@ In the order they run:
 2. `/grill-me` — lock the design. It interviews me one question at a time, with its own recommendation each time, until no decision is left open.
 3. `/slice` — cut the approved plan into an ordered stack of small, self contained PRs, written to a ledger file in the repo so it survives across sessions.
 4. `/next-task <ledger>` — in a fresh session in the repo (better context management), build the next slice off the ledger: reconcile against git, implement using TDD, stop before merge.
-5. `/submit` — I read the diff, then this commits the slice (one-line conventional commit, no attribution) and opens a tight PR.
-6. `/greploop` — run Greptile on the PR and fix its comments in a loop until it scores 5/5 with nothing unresolved. Then merge, and on to the next slice.
+5. `/review` — review the complete change against its intent and surrounding code. It reports concrete findings and never edits anything.
+6. `/submit` — commit the reviewed slice (one-line conventional commit, no attribution) and open a tight PR.
 
 For longer work, `/handoff` saves the current state before a context reset and `/continue` picks it up in a fresh conversation. They store one pending handoff per repository under `~/.ship-loop/handoffs/` and do not change the shipping sequence.
 
@@ -48,20 +48,19 @@ Load the principles globally by importing `principles.md` from your `~/.claude/C
 @/absolute/path/to/ship-loop/principles.md
 ```
 
-Then invoke a skill with `/scope`, `/grill-me`, `/slice`, `/next-task`, `/submit`, `/greploop`, `/handoff`, or `/continue`.
+Then invoke a skill with `/scope`, `/grill-me`, `/slice`, `/next-task`, `/review`, `/submit`, `/handoff`, or `/continue`.
 
 ## Tools I lean on
 
 - [Claude Code](https://www.anthropic.com/claude-code) — what it all runs in.
 - [Warp](https://www.warp.dev) — the terminal I use for the parallel panes ([plugin](https://github.com/warpdotdev/claude-code-warp)).
 - [treehouse](https://github.com/mark-hingston/treehouse-worktree) — git worktree manager, keeps parallel slices isolated.
-- [Greptile](https://greptile.com) — the review bot `greploop` drives the PR against. Amazing tool, a little expensive.
 - [claude-mem](https://github.com/thedotmack/claude-mem) — optional memory so decisions carry across sessions. very useful, highly recommended.
 - [opensrc](https://github.com/vercel-labs/opensrc) — read a dependency's real source code instead of guessing. Much more effective!
 - [caveman](https://github.com/JuliusBrussee/caveman) — compresses output to cut token usage. I run it in ultra. It supposedly cuts around 50% of the tokens usage.
-- [no-mistakes](https://github.com/kunchenguid/no-mistakes) — a pre-PR gate: push to it instead of origin and it runs review/test/lint before opening the PR. Different angle from greploop, haven't used it much yet.
+- [no-mistakes](https://github.com/kunchenguid/no-mistakes) — an optional pre-PR gate that runs review, tests, and lint before opening the PR. I haven't used it much yet.
 
-`grill-me` is by [Matt Pocock](https://github.com/mattpocock/skills), `greploop` is by [greptileai](https://greptile.com).
+`grill-me` is by [Matt Pocock](https://github.com/mattpocock/skills).
 
 ## Conventions
 
@@ -74,4 +73,4 @@ Then invoke a skill with `/scope`, `/grill-me`, `/slice`, `/next-task`, `/submit
 
 ## License
 
-MIT. `grill-me` and `greploop` stay under their authors' terms (Matt Pocock, greptileai).
+MIT. `grill-me` stays under its author's terms (Matt Pocock).

@@ -5,7 +5,7 @@ description: Commit the current slice and open its PR for review. Run after `/ne
 
 Commit one slice and open its PR. Match the repo's conventions; orient the reviewer, don't dump noise.
 
-1. Preconditions (stop if unmet): the working tree holds exactly this slice's changes and the verify gate is green. If on the default branch, create a feature branch `type/short-slug`.
+1. Preconditions (stop if unmet): the working tree holds exactly this slice's changes, the verify gate is green, and `/review` has no unresolved blocking findings. If on the default branch, create a feature branch `type/short-slug`.
 2. Commit. One line, imperative, never a body, NEVER a `Co-Authored-By` / "Generated with" / any attribution line:
    ```
    type(scope): summary
@@ -22,4 +22,4 @@ Commit one slice and open its PR. Match the repo's conventions; orient the revie
    - <1-2 bullets: the real risk to scrutinize, plus any gotcha>
    ```
    Cut anything the diff already shows (logging, field plumbing, "nothing breaks" reassurance). No test list, no migration essay, no attribution footer.
-4. Output the PR URL and stop. Code review (e.g. `greploop`) follows.
+4. Output the PR URL and stop. Review already happened before submission; merge stays with the user.

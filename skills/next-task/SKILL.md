@@ -11,11 +11,11 @@ Args: `<ledger>` (required; the stack ledger path is how this fresh conversation
 2. Reconcile against git. The ledger is only a cursor: check `gh pr list --state all` / `git log` to see what actually merged or is open, trust git over the checkboxes, and fix the cursor if it drifted.
 3. Pick the target slice (the given PR#, else the first unchecked slice whose deps are done) and pick its base branch:
    - dep merged to develop: branch off develop.
-   - dep still in an open, greplooped PR: branch off that PR's branch (stacked), so you do not wait for the merge. Record it in the ledger as stacked on that PR; it needs a restack onto develop when the dep merges.
+   - dep still in an open, reviewed PR: branch off that PR's branch (stacked), so you do not wait for the merge. Record it in the ledger as stacked on that PR; it needs a restack onto develop when the dep merges.
    - dep not built or PR'd yet: stop and say which.
 4. Build only that slice, on that branch:
    - Make a todo list for it.
    - TDD where unit-testable: failing test first, then implement. UI/glue: a one-line "does X, breaks on Y" contract.
    - Vertical: every layer this slice touches, nothing from later slices.
    - Run the project's verify command (lint, types, unit tests — e.g. `make verify` or `npm run verify`) and the integration suite if the slice hits it, before handing back.
-5. Do NOT merge. Hand back for review, then `/submit`. When the dep PR later merges, restack this branch onto develop. After this slice merges, tick it in the ledger, move the cursor, and link the PR number.
+5. Do NOT merge. Hand back for `/review`, then `/submit`. When the dep PR later merges, restack this branch onto develop. After this slice merges, tick it in the ledger, move the cursor, and link the PR number.
