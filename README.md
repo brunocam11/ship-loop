@@ -1,54 +1,57 @@
-A small set of Claude Code skills that turn a feature into a stack of small, reviewable PRs, shipped one at a time. Pieced together from other people's setups and trimmed down to what actually gets used. Sharing it in case it's useful. Ofc this let you work in multiple tasks/features in parallel.
+A small set of skills for building with Claude Code and Codex in steps you can review and understand. Agree the behavior first, give the agent room to implement it, then review before shipping. The workflow is language agnostic.
 
 ## The loop
 
 ```
-scope ─▶ grill-me ─▶ slice ─▶ next-task ─▶ review ─▶ submit ─▶ merge PR
+research -> approved plan -> implement + delegated checks
+         -> guided review -> fresh AI review -> approved fixes
+         -> final check -> publish PR
 ```
 
-`scope` and `grill-me` run once per feature; `slice` onward repeats for each PR until the stack is merged.
+Repeat for each small PR. Use `scope`, `grill-me`, and `slice` only when they help define the work. Publishing needs explicit authorization.
 
 ## The skills
 
-In the order they run:
+Use the skills the task needs:
 
 1. `/scope` — turn an ambiguous ask into a defined task: problem statement, what's out of scope, and either a few options or one task with its contract. Skip it when the ask is already clear.
-2. `/grill-me` — lock the design. It interviews me one question at a time, with its own recommendation each time, until no decision is left open.
-3. `/slice` — cut the approved plan into an ordered stack of small, self contained PRs, written to a ledger file in the repo so it survives across sessions.
-4. `/next-task <ledger>` — in a fresh session in the repo (better context management), build the next slice off the ledger: reconcile against git, implement using TDD, stop before merge.
-5. `/review` — review the complete change against its intent and surrounding code. It reports concrete findings and never edits anything.
-6. `/submit` — commit the reviewed slice (one-line conventional commit, no attribution) and open a tight PR.
+2. `/grill-me` — question unresolved decisions about behavior, dependencies, storage, or structure. Skip it when those decisions are clear.
+3. `/slice` — agree small implementation steps in one plan file per feature. Reuse an existing file and ask before creating one. Each step records the goal, files, test assertions, exclusions, finish line, checks and runner, plus failure handling for I/O.
+4. `/next-task <plan> [step]` — implement one approved step, run delegated checks, and hand back deviations, evidence, and a reading map. A fresh implementation session is optional.
+5. `/review` — compare the complete change with the approved plan and surrounding code. Report concrete findings and unnecessary machinery without editing. By default, Claude reviews Codex's code and Codex reviews Claude's in a fresh context.
+6. `/submit` — after review and explicit publication authorization, commit the slice and open a concise PR.
 
 For longer work, `/handoff` saves the current state before a context reset and `/continue` picks it up in a fresh conversation. They store one pending handoff per repository under `~/.ship-loop/handoffs/` and do not change the shipping sequence.
 
-Independent slices I run at the same time, each in its own git worktree and terminal. Dependent ones stack on each other's branches so I'm not waiting on a merge to start the next. I use Warp for the panes and treehouse for the worktrees.
+Worktrees, stacked PRs, and delegation are optional for work that benefits from them. Keep one writer and one fresh reviewer for each change.
 
 ## Principles and playbook
 
-The skills are the verbs. Two files sit under them and decide how those verbs behave.
+Keep rules at the level where they apply:
 
-- `principles.md` — how I want the agent to work in every session: simple over clever, minimal diffs, read the real code before deciding, verify before merging, CLIs over MCPs. It loads globally (the import in Install below), so it applies no matter which skill is running. Without it the skills still run, but the agent's defaults drift.
-- `playbook.md` — how the verbs compose: which skills to chain for a feature vs a bugfix vs a refactor, and the rules for combining them (contract-first, parallel only where it's safe). It's the map for why the loop is shaped the way it is.
+- Shared principles: personal coding rules used by the writer and reviewer. `principles.md` provides portable defaults; use your existing source of truth if you already have one.
+- Repository `AGENTS.md`: local architecture, conventions, and commands. Claude's `CLAUDE.md` can import it with `@AGENTS.md`.
+- Feature plan: approved behavior, scope, checks, decisions, and progress. Internal implementation details stay flexible.
 
-Short version: skills do the work, principles and playbook decide how and in what order.
+The skills perform the steps; `playbook.md` describes how to combine them.
 
 ## Install
 
-Copy the skills into your Claude Code skills directory:
+Compare source skills with any installed copies and reconcile local edits first. Install reviewed skills individually in `~/.claude/skills/` for Claude Code or `~/.agents/skills/` for Codex. Don't bulk overwrite an existing collection.
 
-```sh
-cp -r skills/* ~/.claude/skills/        # global: available in every repo
-# or per project:
-cp -r skills/* <your-repo>/.claude/skills/
-```
-
-Load the principles globally by importing `principles.md` from your `~/.claude/CLAUDE.md`:
+Load your shared principles from `~/.claude/CLAUDE.md` using Claude's import syntax:
 
 ```
 @/absolute/path/to/ship-loop/principles.md
 ```
 
-Then invoke a skill with `/scope`, `/grill-me`, `/slice`, `/next-task`, `/review`, `/submit`, `/handoff`, or `/continue`.
+For Codex, put an explicit instruction in `~/.codex/AGENTS.md`:
+
+```text
+Before working, read and follow `/absolute/path/to/ship-loop/principles.md`.
+```
+
+These examples can point to your existing shared principles file. Invoke the installed skills as needed.
 
 ## Tools I lean on
 
@@ -64,10 +67,11 @@ Then invoke a skill with `/scope`, `/grill-me`, `/slice`, `/next-task`, `/review
 
 ## Conventions
 
-- Self-contained PRs: each one ships with its own tests and stays green on its own. Many thin PRs beat a few thick ones.
-- Order so nothing breaks: new code paths stay behind a flag or unwired until the last PR wires the feature together.
-- Contract-first for cross-cutting work: lock the API shape, schema, and shared types first. That's what makes the rest parallelizable.
-- TDD: failing test, then implement. You own the tests by reviewing, not writing them.
+- One behavior per review. Around 300 changed lines including tests is a checkpoint to explain growth and consider splitting, not a hard limit.
+- Prefer vertical slices. Agree important interfaces and preserve compatibility without adding machinery by default.
+- Tests prove agreed behavior. Delegate their execution explicitly; for test-first work, the agent observes a failure and a pass. The user does the final runtime check unless delegated.
+- Predict before the implementation explanation, then read together. Approve review fixes before the writer applies them.
+- PR descriptions briefly state behavior, exclusions, failure handling, and actual evidence. Keep small commits and resolve or explain dismissed review findings.
 - Commits: one line, conventional.
 - Use CLIs whenever possible, try to not use MCPs to not bloat out the context window. Much more efficient.
 

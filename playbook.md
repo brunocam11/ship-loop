@@ -1,29 +1,26 @@
 # Playbook
 
-Skills are verbs. Compose only what the task needs; nothing forces a stage order. Start where the task starts.
+Use only the skills the task needs. Build a new skill only when real work exposes a gap.
 
-Build a verb only when a real task needs it.
+## Rules and context
 
-## Verbs
-- `scope` — ambiguous ask -> defined task (problem statement + out-of-scope + options or one task, with the contract). The entry point when the task isn't defined yet.
-- `grill-me` — lock the design; resolve every branch before building. The default start for defined, non-trivial work.
-- `slice` — approved plan -> ordered stack of small, independently-reviewable PRs, written in place as the feature's progress ledger (`.claude/<feature>.md`, local). Size-gate first: skip slicing if it's one PR (~800-1k LOC incl. tests).
-- `next-task` — in a fresh conversation in the repo, `/next-task <ledger>` builds the next/given slice from the ledger: reconcile vs git, vertical TDD, stop before merge. The execution step for each `slice` increment.
-- `review` — read-only review of the complete change against its intent, surrounding code, and local practices. Reports concrete findings without fixing them.
-- `submit` — commit the reviewed slice (one-line conventional commit, never any attribution) and open its PR with a concise reviewer-oriented body. Runs after `/next-task` and `/review`.
+Workflow skills stay language agnostic. Shared principles hold personal coding rules. Repository `AGENTS.md` holds local commands, conventions, and architecture; Claude's `CLAUDE.md` can import it with `@AGENTS.md`.
 
-## Recipes
-Start where the task starts: ambiguous -> `scope`; defined task -> `grill-me`.
-- Feature: `(scope if fuzzy) -> grill-me -> slice -> [failing test -> implement -> review -> submit] per slice -> ship`.
-- Bugfix: reproduce `-> failing test -> implement -> review -> submit`.
-- Refactor: read code as truth `-> characterization test -> implement`.
-- Big cross-cutting feature (back + front + DB + deploy): `scope -> grill-me (lock the contract: API shape / schema / shared types) -> land the foundation first (migration via expand/contract + contract types, its own small PR) -> parallel worktrees for independent seams (backend, frontend, each against the contract) + stacked PRs for the dependent chain -> integrate behind a feature flag -> verify end-to-end -> ship the vertical slice -> cleanup PR`.
+Keep one approved plan file per feature in the repo, including progress and material decisions. Reuse an existing file; agree the path before creating one. The plan defines behavior and scope, while code and Git show what actually exists.
 
-## Operating rules
-- Grill to start: any defined non-trivial task begins with `grill-me` — decide the design before building, so you understand it before it exists.
-- Contract-first decomposition: before splitting a big feature, lock the contract (API shape, schema change, shared types). The contract is the source of truth that makes layers independent. Parallelize only non-overlapping seams (separate git worktrees, one session each); express dependent chains as stacked PRs. Keep every step backward-compatible and behind a flag so it stays reversible.
-- TDD: tests come first and are written by the workflow, not by hand. Red (failing test) -> green (implement) -> refactor. You own them by reviewing, not authoring.
-- Model routing: best model for scope/grill/architecture/review; cheaper/faster for mechanical implementation.
-- Read real source: touching an unfamiliar dependency, read its real source first (e.g. with `opensrc`), don't guess.
-- Review before submit: run `/review` in a fresh session or isolated reviewer context when practical. It reports findings only; fixes are a separate user-directed step.
-- Explore via subagent: broad codebase or library sweeps go to a subagent that returns the conclusion, keeping main context lean.
+## The loop
+
+1. Research the relevant code and risks. Use `scope` for an ambiguous ask. Use `grill-me` only for unresolved decisions about behavior, dependencies, storage, or structure; skip implementation trivia.
+2. Agree the plan before building. Use `slice` when decomposition helps. Each step needs a Goal, Files, Test assertions, Excluded, Finish line, and Checks and runner. For I/O, include a `Failure | Handling | Test` table. A finish line is behavior that runs, never final code. Note what later steps will likely change. Agree important interfaces, then leave internal implementation choices flexible.
+3. Use `next-task` for one approved step. Prefer vertical slices and existing patterns. Stop for approval when behavior, interfaces, dependencies, failure handling, or scope must change. Around 300 changed lines including tests is a checkpoint to explain growth and consider splitting.
+4. The agent runs explicitly delegated checks. For test-first work, it observes the intended failure and then the pass. The user runs the app and does the final check unless that is also explicitly delegated. Report actual evidence and anything unrun.
+5. Hand back deviations, check results, and a reading map. The user predicts the key behavior before the agent explains the implementation. Walk through the code together until the user understands what will ship.
+6. Use the other model in a fresh context as the default AI reviewer: Codex reviews Claude's code and Claude reviews Codex's. Give it the approved plan, diff, and repository instructions. `review` compares the change with the goal and exclusions and reports concrete findings, including unnecessary machinery. It does not fix them.
+7. The user approves fixes, the writer applies them, and relevant delegated checks run again. The user completes the final check. Keep one writer and one fresh reviewer.
+8. Publish the reviewed PR only with explicit authorization. Publish as soon as a step is reviewed. Holding a reviewed step for code you expect to change is the failure mode. A branch older than half a day means the step was too big. Use small commits that tell the story. The PR description states the behavior, exclusions, failure handling, and evidence briefly. If posting AI findings as PR comments is authorized, record each finding's resolution or reason for dismissal.
+
+## Optional tools
+
+Fresh implementation sessions, worktrees, stacked PRs, and delegation are useful when the work needs them. They are not required for every step. Don't add feature flags, generated mocks, or contract packages unless the agreed behavior or rollout requires them.
+
+`handoff` and `continue` help with context resets. `submit` belongs after review and publication authorization.

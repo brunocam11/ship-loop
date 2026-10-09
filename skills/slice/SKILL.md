@@ -1,27 +1,34 @@
 ---
 name: slice
-description: Turn an approved plan into an ordered stack of small, independently-reviewable PRs, written in place as the feature's progress ledger. Use after a plan is approved and before implementation, when work needs splitting into manageable PRs that survive across conversations.
+description: Turn an agreed feature into small, reviewable implementation steps. Use before building when the work needs decomposition or a durable plan; keep one step when the change already fits one review.
 ---
 
-One job: an approved plan into an ordered PR stack you can ship one at a time without blocking review. Stop the moment the plan is one reviewable PR; don't manufacture slices.
+Plan one behavior the user can review in one sitting. Stop splitting when it fits.
 
-1. Size is one of three split axes. ~800-1k LOC incl. tests is a comfortable single PR, but split below that bar too whenever any one of these holds: separate review concerns (e.g. a risky LLM-prompt change vs pure presentation, different eyes and different risk), or a deploy/verify ordering dependency (a later slice can't be verified until an earlier one ships). If none hold and it's one concern under the bar, say so and stop, hand straight to the build loop.
-2. Lock the contract (cross-cutting only). The shared types / API shape / schema change is what makes the rest independent. If it moves, it's PR 1, its own small PR, expand/contract so it stays reversible. If the feature spans repos (separate front and back), the contract is slice zero: publish the API spec or shared types first as its own deliverable, then backend and frontend slices proceed in parallel against it, frontend building against a generated mock and types.
-3. Each PR is self-contained and ships with its own tests. It can be a full vertical slice (API + UI + test) or a single layer — backend and frontend don't have to land in the same PR — as long as it's independently reviewable and doesn't break the build. Many thin > few thick.
-4. Order so the stack is always safe to merge. Every PR keeps the build and the app green on its own (new code paths stay behind a flag or unwired until ready), and the last PR wires it all together so the feature actually works end to end. Then classify each slice: `depends-on` (blockers first), size (S/M/L), AFK (mergeable unattended) vs HITL (needs a human decision/review), and any feature-flag / migration note. Non-code steps (backfill, re-synthesis, config/flag flips) go in the stack as `ops` entries, not PRs.
-5. Decide what parallelizes. A dependent chain (PR2 needs PR1) is built as stacked PRs: each slice branches off the previous one's branch, so you start the next as soon as the prior is reviewed, without waiting for the merge. Slices with no dep edge between them are independent: run them in parallel in separate git worktrees, one session each. Stack only the chain.
-6. Quiz to approval. Present the numbered stack and ask: granularity right? deps right? anything to split or merge? Iterate until approved.
-7. Write the ledger in place. Rewrite the existing plan doc into the template below, same file, don't spawn a new one (only create `.claude/<feature>.md` if no plan doc exists). It stops being temporary; it is now the progress cursor. `gh pr list` / `git log` is the source of truth and the ledger is only the cursor, so always reconcile against git when resuming in a new conversation.
+1. Read the relevant code and repository instructions. Identify existing patterns, affected callers, and compatibility risks before proposing changes. For compatibility-sensitive changes, follow affected stored data, external contracts, and lifecycle behavior. Record the key safety assumption and supporting evidence, marking anything unverified. Include a check that could disprove the assumption under Checks and runner, assigned to the agreed runner.
+2. Prefer vertical slices with observable behavior. Avoid doing all backend work before all frontend work. A foundation step is reasonable when it is independently useful and verifiable. Record dependencies and agree shared interfaces where needed; don't prescribe extra flags, mocks, or abstractions by default. For new or changed shared interfaces, include one short caller example under Interfaces and identify who owns mutable state where relevant. Use this to agree observable behavior while leaving internal implementation flexible.
+3. Use the template below for each step. Goal, Files, Test assertions, Excluded, Finish line, and Checks and runner are required. For a low-impact change that needs no new test, say why under Test assertions. Keep Interfaces only when a shared API, type, or schema changes. Keep the failure table for I/O; include meaningful failures, not every imaginable exception. Omit it otherwise. Add material decisions only when relevant. The finish line is behavior that runs end to end. Final is never a finish line. Later steps may change this code; say what is provisional. If nothing runs after about two hours, the step is too big.
+4. Present the plan for approval before implementation. Reuse one plan file per feature. If none exists, agree its path with the user before creating it. Preserve the approved plan and progress there so work can resume after a context reset.
 
+```markdown
+# <Feature>
+
+## Step 1: <behavior>
+Status: proposed / approved / implemented / reviewed / shipped
+Goal: <observable outcome>
+Files: <expected files and their responsibilities>
+Interfaces: <shared API, type, or schema changes, if any>
+Test assertions: <behavior to prove, or why no new test is needed>
+Excluded: <work deliberately outside this step>
+Finish line: <what makes this step complete>
+Checks and runner: <commands or manual checks; agent or user for each>
+
+Failures (I/O only):
+| Failure | Handling | Test |
+| --- | --- | --- |
+| <meaningful failure> | <agreed response> | <assertion or manual check> |
 ```
-# Feature — <name>
-Contract: <shared types / API shape / schema>   # omit if not cross-cutting
-Cursor: next = PR<n>   (PR1 #<id> merged, ...)
 
-- [ ] PR1 — <end-to-end behavior, not layer-by-layer>   deps: none   ~S   AFK
-- [ ] ops — <non-code step: backfill / re-synth / flag>  deps: PR1    after deploy
-- [ ] PR2 — <...>                                        deps: PR1    ~M   HITL  (flag: x, migration: expand)
-Decisions: <one-liners resolved while slicing>   # distilled to your decision memory on ship (optional)
-```
+Keep internal implementation choices flexible within the approved behavior. If the diff grows beyond about 300 changed lines including tests, explain the growth and consider splitting; this is a review checkpoint, not a hard limit.
 
-Each slice then runs the build loop (write the test, implement, review, submit, ship), ticked and PR-linked on merge. On full ship: distill `Decisions` to your decision memory (optional), delete the ledger; git and the merged PRs remain the record.
+Each step uses `next-task`, guided user review, then a fresh AI review. The user predicts behavior before the implementation explanation. Fixes need approval; publishing a reviewed PR needs explicit authorization. Stacking, worktrees, and delegation are optional when the work benefits from them.

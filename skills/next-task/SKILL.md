@@ -1,21 +1,14 @@
 ---
 name: next-task
-description: Invoked as `/next-task <ledger>` in a fresh conversation in the repo. Builds the next unchecked slice from a feature's stack ledger: reconcile against git, pick the right base (stack on an open reviewed PR when the dep is not merged yet), implement vertically with TDD, and stop before merge. Run after manually opening a new pane + claude.
+description: Implement one approved step from a feature plan and hand it back for guided review. Use after plan approval, including when resuming in a new session; run only checks delegated to the agent.
 ---
 
-Run this in a fresh conversation, in the target repo, to build one slice of a `slice` ledger. You implement only this slice and stop before merge. Review and merge stay with the user.
+Args: `<plan>` and optional `[step]`. Reuse the feature's existing plan; if its location or approval is unclear, resolve that before editing. A fresh session is optional.
 
-Args: `<ledger>` (required; the stack ledger path is how this fresh conversation gets the plan, e.g. `.claude/timeline-provenance.md`) and optional `[PR#]` (defaults to the next unchecked slice whose deps are done, merged or in an open reviewed PR).
+1. Read the plan, applicable instructions, and relevant code. Compare progress with actual code and Git state; flag drift. Select the requested approved step, or the next approved step whose dependencies are available. If a branch is needed, use the repository's actual base or an agreed parent branch, without disturbing existing work.
+2. Confirm the goal, expected files, exclusions, finish line, test assertions, and who runs each check. For I/O, confirm the agreed failure handling. If a material decision is missing, resolve it before building.
+3. Implement only this step, following existing patterns and shared coding principles. Choose internal details freely within the plan. Stop for approval if the work needs changes to behavior, interfaces, dependencies, failure handling, or scope. Don't add speculative recovery paths. If the diff grows beyond about 300 changed lines including tests, explain why and consider splitting.
+4. Write meaningful tests for the agreed assertions. When test execution is delegated, use test-first where practical: run the test, observe the intended failure, implement, then observe it pass. Don't weaken assertions to get green. Run only the checks delegated to the agent; report unrun or blocked checks plainly.
+5. Hand back deviations, actual check results, and a short reading map in that order. Ask the user to predict the key behavior before explaining the implementation. Then walk through the relevant files together, including tradeoffs and any gap between prediction and behavior.
 
-1. Read the passed ledger. If it was omitted, find the one `.claude/*.md` with open `- [ ]` slices; if several, list them and ask.
-2. Reconcile against git. The ledger is only a cursor: check `gh pr list --state all` / `git log` to see what actually merged or is open, trust git over the checkboxes, and fix the cursor if it drifted.
-3. Pick the target slice (the given PR#, else the first unchecked slice whose deps are done) and pick its base branch:
-   - dep merged to develop: branch off develop.
-   - dep still in an open, reviewed PR: branch off that PR's branch (stacked), so you do not wait for the merge. Record it in the ledger as stacked on that PR; it needs a restack onto develop when the dep merges.
-   - dep not built or PR'd yet: stop and say which.
-4. Build only that slice, on that branch:
-   - Make a todo list for it.
-   - TDD where unit-testable: failing test first, then implement. UI/glue: a one-line "does X, breaks on Y" contract.
-   - Vertical: every layer this slice touches, nothing from later slices.
-   - Run the project's verify command (lint, types, unit tests — e.g. `make verify` or `npm run verify`) and the integration suite if the slice hits it, before handing back.
-5. Do NOT merge. Hand back for `/review`, then `/submit`. When the dep PR later merges, restack this branch onto develop. After this slice merges, tick it in the ledger, move the cursor, and link the PR number.
+Stop for user review. Don't commit, publish, merge, restack, or advance to another step without authorization. A fresh AI review reports findings; the user approves fixes before they are applied. Update the existing plan as progress is confirmed.
