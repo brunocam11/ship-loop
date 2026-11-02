@@ -29,3 +29,4 @@ How we work, everywhere. Code is the source of truth; everything else is a lossy
 ## Tokens and output
 12. Prefer CLI over MCP. CLIs return focused text; MCP loads schemas plus verbose output into context. Reach for MCP only when no CLI exists, and load its tools lazily.
 13. Output discipline. Be clear and concise without cutting the reasoning the reader needs. Prefer self-documenting code, with no needless comments or files. For drafting or revising prose, read and follow [write-plain](skills/write-plain/SKILL.md). Apply it directly without requiring the user to invoke it, and reuse the guidance throughout the conversation.
+14. PR descriptions. Before drafting or revising a PR description, including during `submit`, read and follow [pr-description](skills/pr-description/SKILL.md). Apply it without requiring explicit invocation.

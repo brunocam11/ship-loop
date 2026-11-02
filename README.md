@@ -19,7 +19,9 @@ Use the skills the task needs:
 3. `/slice` — agree small implementation steps in one plan file per feature. Reuse an existing file and ask before creating one. Each step records the goal, files, test assertions, exclusions, finish line, checks and runner, plus failure handling for I/O.
 4. `/next-task <plan> [step]` — implement one approved step, run delegated checks, and hand back deviations, evidence, and a reading map. A fresh implementation session is optional.
 5. `/review` — compare the complete change with the approved plan and surrounding code. Report concrete findings and unnecessary machinery without editing. By default, Claude reviews Codex's code and Codex reviews Claude's in a fresh context.
-6. `/submit` — after review and explicit publication authorization, commit the slice and open a concise PR.
+6. `/submit` — after review and explicit publication authorization, commit the slice and open its PR. Use `pr-description` for the body and get approval of the exact draft before publishing.
+
+Use `/pr-description` to draft or revise a PR description on its own. It explains the problem, cause, approach, tradeoffs, and review path. `submit` reads the same skill when preparing a PR.
 
 For longer work, `/handoff` saves the current state before a context reset and `/continue` picks it up in a fresh conversation. They store one pending handoff per repository under `~/.ship-loop/handoffs/` and do not change the shipping sequence.
 
@@ -71,7 +73,7 @@ These examples can point to your existing shared principles file. Invoke the ins
 - Prefer vertical slices. Agree important interfaces and preserve compatibility without adding machinery by default.
 - Tests prove agreed behavior. Delegate their execution explicitly; for test-first work, the agent observes a failure and a pass. The user does the final runtime check unless delegated.
 - Predict before the implementation explanation, then read together. Approve review fixes before the writer applies them.
-- PR descriptions briefly state behavior, exclusions, failure handling, and actual evidence. Keep small commits and resolve or explain dismissed review findings.
+- PR descriptions follow [pr-description](skills/pr-description/SKILL.md). Keep small commits and resolve or explain dismissed review findings.
 - Commits: one line, conventional.
 - Use CLIs whenever possible, try to not use MCPs to not bloat out the context window. Much more efficient.
 
