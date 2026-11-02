@@ -64,6 +64,7 @@ These examples can point to your existing shared principles file. Invoke the ins
 - [opensrc](https://github.com/vercel-labs/opensrc) — read a dependency's real source code instead of guessing. Much more effective!
 - [caveman](https://github.com/JuliusBrussee/caveman) — compresses output to cut token usage. I run it in ultra. It supposedly cuts around 50% of the tokens usage.
 - [no-mistakes](https://github.com/kunchenguid/no-mistakes) — an optional pre-PR gate that runs review, tests, and lint before opening the PR. I haven't used it much yet.
+- [tstack](https://github.com/t3dotgg/tstack) — Theo's skills for more autonomous PR work. I'm trying `full-stop` (builds, reviews and babysits a PR until it's ready, never merges) and `sol-loop` (GPT Sol reviews the change in a loop, the main agent applies the fixes). Installed as they are, with `full-send`, `file-pr`, `babysit-pr` and `leaving-pr-comments` because `full-stop` uses them.
 
 `grill-me` is by [Matt Pocock](https://github.com/mattpocock/skills).
 
