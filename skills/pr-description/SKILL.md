@@ -24,6 +24,7 @@ A small fix can be a few sentences with no headings.
 - Assume reviewers do not remember the code. Name the actual function or file a change is about, and say whether it is new or existing, never a generic label like "the shared writer".
 - Plain words over shorthand. Leave edge cases, limits and field lists to the diff.
 - Claims as strong as the evidence. What was done and why, not how it was found.
+- Only what the code and its evidence show. No chat context, who was contacted, pending feedback or approval requests.
 - No hedges, no emojis, no em-dashes, no praise, no attribution footer.
 
 Return the draft in chat for approval. Drafting does not authorize commits, pushes or edits to a published PR.
