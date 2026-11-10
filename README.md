@@ -21,6 +21,10 @@ Use the skills the task needs:
 5. `/review` — compare the complete change with the approved plan and surrounding code. Report concrete findings and unnecessary machinery without editing. By default, Claude reviews Codex's code and Codex reviews Claude's in a fresh context.
 6. `/submit` — after review and explicit publication authorization, commit the slice and open its PR. Use `pr-description` for the body and get approval of the exact draft before publishing.
 
+Use `/deep-review` instead of `/review` for risky or nontrivial changes, before or after opening the PR. Each model other than the implementer's (from Claude Fable 5.2 and Codex) reviews hands-on in its own worktree, then the orchestrator verifies every finding and ranks it against the ticket. It needs an orchestrator that can delegate across providers, such as T3 Code.
+
+`/council` (from tstack, installed as is while I try it) asks one strong model from each of three providers for review or feedback, applies the fixes it agrees with, and repeats until all three are satisfied. Unlike `deep-review`, it applies fixes itself and records each round's scores in the PR description.
+
 Use `/pr-description` to draft or revise a PR description on its own. It explains the problem, cause, approach, tradeoffs, and review path. `submit` reads the same skill when preparing a PR.
 
 For longer work, `/handoff` saves the current state before a context reset and `/continue` picks it up in a fresh conversation. They store one pending handoff per repository under `~/.ship-loop/handoffs/` and do not change the shipping sequence.
@@ -64,7 +68,7 @@ These examples can point to your existing shared principles file. Invoke the ins
 - [opensrc](https://github.com/vercel-labs/opensrc) — read a dependency's real source code instead of guessing. Much more effective!
 - [caveman](https://github.com/JuliusBrussee/caveman) — compresses output to cut token usage. I run it in ultra. It supposedly cuts around 50% of the tokens usage.
 - [no-mistakes](https://github.com/kunchenguid/no-mistakes) — an optional pre-PR gate that runs review, tests, and lint before opening the PR. I haven't used it much yet.
-- [tstack](https://github.com/t3dotgg/tstack) — Theo's skills for more autonomous PR work. I'm trying `full-stop` (builds, reviews and babysits a PR until it's ready, never merges) and `sol-loop` (GPT Sol reviews the change in a loop, the main agent applies the fixes). Installed as they are, with `full-send`, `file-pr`, `babysit-pr` and `leaving-pr-comments` because `full-stop` uses them.
+- [tstack](https://github.com/t3dotgg/tstack) — Theo's skills for more autonomous PR work. I'm trying `full-stop` (builds, reviews and babysits a PR until it's ready, never merges) and `sol-loop` (GPT Sol reviews the change in a loop, the main agent applies the fixes), and `council` (three providers review in a loop until all agree). Installed as they are, with `full-send`, `file-pr`, `babysit-pr` and `leaving-pr-comments` because `full-stop` uses them.
 
 `grill-me` is by [Matt Pocock](https://github.com/mattpocock/skills).
 
