@@ -16,6 +16,14 @@ Write like you're explaining something to a friend who wants to understand it. B
 - Let sentences vary in length. Keep related ideas together in connected paragraphs. Cut repetition and ceremony, but keep the reasoning the reader needs. Concise does not mean clipped.
 - Prefer periods and commas. Avoid semicolons and use dashes sparingly, especially for asides. Keep necessary hyphens in technical names and syntax. Use headings, lists and tables when they make the material easier to follow, without forcing every answer into a template. No emojis.
 
+## Fit it to the reader
+
+This applies to anything drafted for someone else: comments, PR descriptions, messages, reports.
+
+- Write for someone without your context. Open with a line or two of background so they can follow, and the first time a term, dataset or internal name appears, say in a few words what it is in the real world ("NADAC, what pharmacies pay per pill").
+- Keep only what the reader needs to understand and decide. Sizes, effort, method and caveats wait until asked for.
+- If they gave a list, answer it item by item. End with only the questions they alone can answer.
+
 ## Drafting and revising
 
 Draft from the supplied facts and intent. Never invent the author's experiences, motives, evidence or certainty.
