@@ -21,7 +21,7 @@ Use the skills the task needs:
 5. `/review` — compare the complete change with the approved plan and surrounding code. Report concrete findings and unnecessary machinery without editing. By default, Claude reviews Codex's code and Codex reviews Claude's in a fresh context.
 6. `/submit` — after review and explicit publication authorization, commit the slice and open its PR. Use `pr-description` for the body and get approval of the exact draft before publishing.
 
-Use `/deep-review` instead of `/review` for risky or nontrivial changes, before or after opening the PR. Each model other than the implementer's (from Claude Fable 5.2 and Codex) reviews hands-on in its own worktree, then the orchestrator verifies every finding and ranks it against the ticket. It needs an orchestrator that can delegate across providers, such as T3 Code.
+Use `/deep-review` instead of `/review` for risky or nontrivial changes, before or after opening the PR. Each model other than the implementer's (from Claude Opus 5.5 and Codex) reviews hands-on in its own worktree, then the orchestrator verifies every finding and ranks it against the ticket. It needs an orchestrator that can delegate across providers, such as T3 Code.
 
 `/council` (from tstack, adapted while I try it) asks one strong model from each of three providers for review or feedback, applies the fixes it agrees with, and repeats until all three are satisfied. Unlike `deep-review`, it applies fixes itself and reports each round's scores in the reply, never in the PR.
 

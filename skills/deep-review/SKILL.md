@@ -47,7 +47,7 @@ End with: what you ran and its results, what you could not run, verdict.
 
 ## 4. Spawn
 
-Find which provider implemented the change from the session, commits or PR; if unclear, ask. Start one child task per other provider in parallel; if the implementer is Claude, also start a fresh-context Claude reviewer, since independence comes from fresh context as much as from another provider. Each runs with worktree isolation, its own port, high effort and these models: Claude Fable 5.2 (`claude-fable-5-2`), Codex Sol. Grok is paused because it is too slow; to bring it back, add it here and give it the adversarial part of Claude's lean. A reviewer that fails to start, runs out of quota or times out is missing for this run. Name it in the header and never substitute another model.
+Find which provider implemented the change from the session, commits or PR; if unclear, ask. Start one child task per other provider in parallel; if the implementer is Claude, also start a fresh-context Claude reviewer, since independence comes from fresh context as much as from another provider. Each runs with worktree isolation, its own port, high effort and these models: Claude Opus 5.5 (`claude-opus-5-5`), Codex Sol. Grok is paused because it is too slow; to bring it back, add it here and give it the adversarial part of Claude's lean. A reviewer that fails to start, runs out of quota or times out is missing for this run. Name it in the header and never substitute another model.
 
 ## 5. Adjudicate
 
