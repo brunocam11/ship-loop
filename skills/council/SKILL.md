@@ -20,7 +20,7 @@ In T3 Code, use `orchestrator_capabilities` to resolve the models, then
 `delegate_task` to start one delegate per model in parallel. Elsewhere, use
 the harness's subagent tools. If you cannot reach three providers, or a named
 member is unavailable, report it instead of substituting. Never use Grok;
-when a third provider is unavailable, use Claude Fable as the third member.
+when a third provider is unavailable, use Claude Opus as the third member.
 
 Give each delegate the request and relevant context. For review or feedback,
 keep their work read-only. Collect their responses and summarize the useful
