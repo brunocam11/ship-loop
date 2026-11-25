@@ -34,9 +34,10 @@ Rules: stay inside your worktree. No push, commit to shared branches, PR comment
 
 Lean: <Claude: logic, contracts, regressions across callers, adversarial inputs, failure and retry paths, concurrency, security | Codex: integration, real endpoints, boundary inputs, compatibility with existing callers>. A lean, not a limit.
 
-Find meaningful problems on two equal axes:
+Find meaningful problems. Correctness and simplicity weigh equally; structure counts only with a concrete cost:
 - Correctness: wrong results, races, data loss, security, broken invariants, missed requirements. "No blocking issues" is a valid answer.
 - Simplicity: the smallest implementation that meets the goal, its rough size versus the diff. A gap is a finding only if you can name what to delete and what still works.
+- Structure, only in what the diff adds: shared state with several writers and no single place fixing their order; logic that reads the DB, clock, env or globals instead of taking arguments, or changes an argument its caller still uses; a base class, interface, factory or layer with one use; a helper duplicating existing code (cite it, `file:line`). A finding only with a reachable bug or code to delete.
 
 Prove what you can. A claimed bug needs a reproduction: command, input, observed vs expected, artifact path. For a regression, show it against the base. If a real bug is too expensive to reproduce, give the traced code path and a concrete scenario and label it HYPOTHESIS.
 
